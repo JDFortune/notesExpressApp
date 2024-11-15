@@ -1,0 +1,28 @@
+GET http://localhost:3001/api/notes
+
+###
+
+GET http://localhost:3001/api/notes/67378672b0a2b522757fde4f
+
+###
+
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "Hello Susan"
+}
+
+###
+
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "Hello Charlie",
+  "important": true
+}
+
+###
+
+PUT http://localhost:3001/api/notes/6737cd0dc9811d64807495ce
