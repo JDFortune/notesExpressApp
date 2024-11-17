@@ -26,3 +26,9 @@ Content-Type: application/json
 ###
 
 PUT http://localhost:3001/api/notes/6737cd0dc9811d64807495ce
+Content-Type: application/json
+
+{
+  "content": "Hello Charlie",
+  "important": true
+}

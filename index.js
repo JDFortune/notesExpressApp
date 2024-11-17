@@ -2,15 +2,16 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
-const cors = require('cors');
+// const cors = require('cors');
 const Note = require('./models/note');
+const errorHandler = require('./javascripts/errorHandler')
 
 
+app.use(express.static('dist'));
 app.use(express.json());
 morgan.token('data', (req, res) => { return JSON.stringify(req.body)});
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'));
-app.use(cors());
-app.use(express.static('dist'))
+// app.use(cors());
 
 app.get('/api/notes', (request, response) => {
   Note.find({}).then(notes => {
@@ -18,16 +19,16 @@ app.get('/api/notes', (request, response) => {
   });
 });
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
   Note.findById(request.params.id)
     .then(note => {
-      response.json(note);
+      if (note) {
+        response.json(note);
+      } else {
+        response.status(404).end();
+      }
     })
-    .catch(error => {
-      response.status(404).json({
-        error: 'The note was note found, you silly bitch!'
-      });
-    });
+    .catch(error => next(error));
 });
 
 app.post('/api/notes', (request, response) => {
@@ -49,10 +50,16 @@ app.post('/api/notes', (request, response) => {
 });
 
 app.put('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id)
-    .then(note => {
-      note.important = !note.important;
-      note.save().then(note => response.json(note))
+  const body = request.body;
+
+  const note = {
+    content: body.content,
+    important: body.important,
+  }
+
+  Note.findByIdAndUpdate(request.params.id, note, { new: true })
+    .then(updatedNote => {
+      response.json(updatedNote);
     })
     .catch(error => {
       response.status(404).json({
@@ -62,10 +69,11 @@ app.put('/api/notes/:id', (request, response) => {
 });
 
 app.delete('/api/notes/:id', (request, response) => {
-  const id = request.params.id;
-  notes = notes.filter(note => note.id !== id);
-
-  response.status(204).end();
+  Note.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end();
+    })
+    .catch(error => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
@@ -75,6 +83,7 @@ const unknownEndpoint = (request, response) => {
 }
 
 app.use(unknownEndpoint);
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
