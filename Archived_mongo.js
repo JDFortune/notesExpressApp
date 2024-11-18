@@ -9,7 +9,7 @@ let password = process.argv[2]
 const url = `mongodb+srv://jdfortune1234:${password}@cluster0.wx9u7.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`
 
 mongoose.set('strictQuery',false)
-mongoose.connect(url);
+mongoose.connect(url)
 
 const noteSchema = new mongoose.Schema({
   content: String,
@@ -30,8 +30,8 @@ const Note = mongoose.model('Note', noteSchema)
 
 Note.find({}).then(result => {
   result.forEach(note => {
-    console.log(note);
-  });
+    console.log(note)
+  })
 
-  mongoose.connection.close();
+  mongoose.connection.close()
 })

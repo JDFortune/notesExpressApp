@@ -32,3 +32,14 @@ Content-Type: application/json
   "content": "Hello Charlie",
   "important": true
 }
+
+###
+# bad post request
+
+POST http://localhost:3001/api/notes
+Content-Type: application/json
+
+{
+  "content": "lol",
+  "important": true
+}
